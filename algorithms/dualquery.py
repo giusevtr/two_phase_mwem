@@ -29,7 +29,7 @@ def generate(real_answers:np.array,
              query_manager: QueryManager,
              epsilon: list,
              delta: float,
-             eta=1.2, samples=20):
+             eta=1.2, samples=20, optimal_parameters_path=None):
     D = np.sum(domain.shape)
     Q_size = query_manager.num_queries
     Q_dist = np.ones(2*Q_size)/(2*Q_size)
@@ -47,11 +47,25 @@ def generate(real_answers:np.array,
     epsilon_index = 0
     T = 0
     cumulative_rho_at_time_t = {}
+
+    eta_t = {}
+    samples_t = {}
     while True:
+        if optimal_parameters_path is not None:
+            # Find the best parameters for the current epsilon
+            param_df = pd.read_csv(optimal_parameters_path)
+            epsilon_params = param_df[param_df['epsilon'] == epsilon[epsilon_index]]
+            if len(epsilon_params) == 0: continue
+            eta = epsilon_params.min()['eta']
+            samples = int(epsilon_params.min()['samples'])
+            print(f'updating: at time={T} eta={eta} and samples={samples}')
+        eta_t[T] = eta
+        samples_t[T] = samples
+
         # Multiplicative weights
-        epsilon_0 = 2 * eta * T / N
+        epsilon_0 = 2 * eta_t[T] * T / N
         rho_0 = util2.from_eps_to_rho(epsilon_0)
-        cumulative_rho += samples*rho_0
+        cumulative_rho += samples_t[T]*rho_0
         cumulative_rho_at_time_t[T] = cumulative_rho
         T = T + 1
 
@@ -66,7 +80,7 @@ def generate(real_answers:np.array,
         """
         queries = []
         neg_queries = []
-        for _ in range(samples):
+        for _ in range(samples_t[t]):
             q_id = util2.sample(Q_dist)
             if q_id < Q_size:
                 queries.append(q_id)
@@ -92,7 +106,7 @@ def generate(real_answers:np.array,
         fake_answers = query_manager.get_answer(fake_data)
         neg_fake_answers = 1 - fake_answers
         A = np.append(real_answers - fake_answers, neg_real_answers - neg_fake_answers)
-        Q_dist = np.exp(eta*A)*Q_dist
+        Q_dist = np.exp(eta_t[t]*A)*Q_dist
 
         """
         ## Normalize
@@ -185,7 +199,7 @@ if __name__ == "__main__":
     dataset = 'adult'
     workload = 64
     marginal = 3
-    epsilon = [0.4]
+    epsilon = [0.5]
     eta_low = 0.5
     eta_hi = 7
     samples_low = 2

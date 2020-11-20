@@ -1,7 +1,8 @@
 import numpy as np
 import itertools
 from collections.abc import Iterable
-
+from datasets.dataset import Dataset
+from datasets.domain import Domain
 
 class QueryManager():
     """< 1e-9
@@ -87,3 +88,14 @@ class QueryManager():
                 x = x / N_sync
             ans_vec = np.append(ans_vec, x)
         return ans_vec
+
+    def get_query_matrix(self, support_dataset: Dataset, domain: Domain, q_ids: list):
+        Q = []
+        for row in support_dataset.df.iterrows():
+            row_arr = row[1].values
+            row_dataset = Dataset([row_arr], domain)
+            answers = self.get_answer(row_dataset)
+            Q.append(answers)
+        Q = np.array(Q).T
+        return Q
+

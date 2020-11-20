@@ -18,6 +18,10 @@ if __name__ == "__main__":
     parser.add_argument('marginal', type=int, nargs=1, help='queries')
     args = parser.parse_args()
 
+    dq_param_path = 'ResultsBO/dualquery_{}_{}_{}.csv'.format(args.dataset[0], args.workload[0], args.marginal[0])
+    if not os.path.exists(dq_param_path):
+        print('optimal parameters file for DQ does not exists!')
+        dq_param_path = None
     print("=============================================")
     print(vars(args))
     total_runs = 5
@@ -56,7 +60,7 @@ if __name__ == "__main__":
         fem_data_fun = fem.generate(real_ans, N, data.domain, query_manager, epsilon_list, delta,
                                        epsilon_split=0.01345, noise_multiple=0.099, samples=25)
         # Dualquery
-        dq_data_fun = dualquery.generate(real_ans, N, data.domain, query_manager, epsilon_list, delta, eta=3.36, samples=9)
+        dq_data_fun = dualquery.generate(real_ans, N, data.domain, query_manager, epsilon_list, delta, eta=3.36, samples=9, optimal_parameters_path=dq_param_path)
 
         for e in epsilon_list:
             # Save FEM
