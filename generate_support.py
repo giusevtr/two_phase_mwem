@@ -65,7 +65,7 @@ if __name__ == "__main__":
             fem_data.df.to_csv(fem_path, index=False)
             fem_rho_path = f'{ith_support_path}/fem_{e:.1f}.txt'
             rho_file = open(fem_rho_path, 'w')
-            rho_file.write(str(dq_rho))
+            rho_file.write(str(fem_rho))
             rho_file.close()
 
             dq_data, dq_rho = dq_data_fun(e)
