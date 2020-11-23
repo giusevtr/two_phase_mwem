@@ -39,6 +39,7 @@ if __name__ == "__main__":
     real_ans = query_manager.get_answer(data)
 
     # Store synthetic support
+    file_prefix = f'{args.dataset[0]}_{args.workload[0]}_{args.marginal[0]}'
     support_path = 'private_support/{}_{}_{}'.format(args.dataset[0], args.workload[0], args.marginal[0])
     os.makedirs('private_support', exist_ok=True)
     os.makedirs(support_path, exist_ok=True)
@@ -88,7 +89,7 @@ if __name__ == "__main__":
 
     results_dir = 'ResultsMWEM'
     os.makedirs(results_dir, exist_ok=True)
-    results_path = f'{results_dir}/mwme_priv_supp_result.csv'
+    results_path = f'{results_dir}/{file_prefix}.csv'
     print(f'saving results in {results_path}')
     columns = ['run_id', 'support_algorithm', 'support_epsilon', 'total_epsilon', 'support_error', 'mwem_error']
     df = pd.DataFrame(RESULTS, columns=columns)
