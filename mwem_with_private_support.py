@@ -82,10 +82,14 @@ if __name__ == "__main__":
 
                     row = [run_id, support_algo, e, mwem_eps, support_max_error, mwem_max_error]
                     RESULTS.append(row)
+                    print(f'{RESULTS}')
     # return support_error, mwem_error
 
-    results_path = 'ResultsMWEM'
-    os.makedirs(results_path, exist_ok=True)
+
+    results_dir = 'ResultsMWEM'
+    os.makedirs(results_dir, exist_ok=True)
+    results_path = f'{results_dir}/mwme_priv_supp_result.csv'
+    print(f'saving results in {results_path}')
     columns = ['run_id', 'support_algorithm', 'support_epsilon', 'total_epsilon', 'support_error', 'mwem_error']
     df = pd.DataFrame(RESULTS, columns=columns)
     df.to_csv(results_path, index=False)
