@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
                     row = [run_id, support_algo, e, mwem_eps, support_max_error, mwem_max_error]
                     RESULTS.append(row)
-                    print(f'{RESULTS}')
+                    print(f'{row}')
     # return support_error, mwem_error
 
 
