@@ -31,7 +31,7 @@ def generate(real_answers:np.array,
              delta: float,
              eta=1.2, samples=20, optimal_parameters_path=None):
     D = np.sum(domain.shape)
-    Q_size = query_manager.num_queries
+    Q_size = query_manager.get_num_queries()
     Q_dist = np.ones(2*Q_size)/(2*Q_size)
 
     """

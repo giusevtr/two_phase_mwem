@@ -61,10 +61,12 @@ if __name__ == "__main__":
             # read FEM support
             for support_algo in ['fem', 'dualquery']:
                 data_path = f'{ith_support_path}/{support_algo}_{e:.1f}.csv'
-                rho_path = f'{ith_support_path}/{support_algo}_{e:.1f}.csv'
+                rho_path = f'{ith_support_path}/{support_algo}_{e:.1f}.txt'
                 rho_file = open(rho_path, 'r')
                 cumulative_rho = float(rho_file.readline())
                 rho_file.close()
+
+                print(f'reading path = {data_path}, rho = {cumulative_rho}')
 
                 support_dataset = Dataset(pd.read_csv(data_path), domain=data.domain)
                 fd_sz = support_dataset.df.shape[0]

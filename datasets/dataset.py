@@ -39,6 +39,10 @@ class Dataset:
         domain = Domain(config.keys(), config.values())
         return Dataset(df, domain)
 
+    def sample(self, s):
+        sample_df = self.df.sample(s)
+        return Dataset(sample_df, domain=self.domain)
+
     def project(self, cols):
         """ project dataset onto a subset of columns """
         if type(cols) in [str, int]:

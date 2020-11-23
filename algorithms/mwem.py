@@ -4,7 +4,10 @@ from algorithms import exponential_mechanism
 from datasets.dataset import Dataset
 from Util.qm import QueryManager
 from Util import util2
-
+from datasets.dataset import Dataset
+from datasets.domain import Domain
+from Util import benchmarks
+import argparse
 
 def get_data_onehot(data):
     df_data = data.df.copy()
@@ -66,6 +69,7 @@ def generate(start_data: Dataset,
 
         # 1) Exponential Mechanism
         score = np.abs(real_answers - fake_answers)
+        # print(f'error({T}) = {np.max(score)}, rho={cumulative_rho},   eps0={epsilon_0},   epsilon={epsilon}')
         # eps0 = np.sqrt(2*rho_0)
         q_t_ind = exponential_mechanism.sample(score, N, eps0=epsilon_0/2)
 
@@ -86,9 +90,60 @@ def generate(start_data: Dataset,
         A_avg += A
 
     A_avg /= (T+1)
-
+    assert np.abs(np.sum(A_avg) - 1) < 0.0001, 'A_avg is not a distribution'
     if return_last:
         return A_avg, A
     return data_support, A_avg
 
 
+
+if __name__ == "__main__":
+    description = ''
+    formatter = argparse.ArgumentDefaultsHelpFormatter
+    parser = argparse.ArgumentParser(description=description, formatter_class=formatter)
+    parser.add_argument('dataset', type=str, nargs=1, help='queries')
+    parser.add_argument('workload', type=int, nargs=1, help='queries')
+    parser.add_argument('marginal', type=int, nargs=1, help='queries')
+    parser.add_argument('epsilon', type=float, nargs='+', help='Privacy parameter')
+    parser.add_argument('--epsilon_split', type=float, default=0.02, help='eps0 hyperparameter')
+    args = parser.parse_args()
+
+    print("=============================================")
+    print(vars(args))
+
+    ######################################################
+    ## Get dataset
+    ######################################################
+    data, workloads = benchmarks.randomKway(args.dataset[0], args.workload[0], args.marginal[0])
+    N = data.df.shape[0]
+    delta = 1.0/N**2
+
+    ######################################################
+    ## Get Queries
+    ######################################################
+    query_manager = QueryManager(data.domain, workloads)
+    print("Number of queries = ", len(query_manager.queries))
+
+    real_ans = query_manager.get_answer(data)
+
+    V = real_ans > 0.05
+    support_size = np.sum(V)
+    ######################################################
+    ## Generate synthetic data with eps
+    ######################################################
+    rand_data = Dataset.synthetic(data.domain, N=support_size)
+    samp_data = data.sample(s=support_size)
+    rand_data.df.drop_duplicates(inplace=True)
+
+    samp_data.df.drop_duplicates(inplace=True)
+    samp_support_error = np.abs(real_ans - query_manager.get_answer(samp_data)).max()
+    print(f'samp_data size = {len(samp_data.df)} error = {samp_support_error}')
+
+    print("epsilon\trandom_supp error\tsampled_supp error")
+    for eps in args.epsilon:
+        rand_supp, rand_dist = generate(start_data=rand_data, real_answers=real_ans, N=N, query_manager=query_manager, epsilon=eps, delta=delta, epsilon_split=args.epsilon_split)
+        samp_supp, samp_dist = generate(start_data=samp_data, real_answers=real_ans, N=N, query_manager=query_manager, epsilon=eps, delta=delta, epsilon_split=args.epsilon_split)
+
+        max_error_random_support = np.abs(real_ans - query_manager.get_answer(rand_supp, rand_dist)).max()
+        max_error_sampled_support = np.abs(real_ans - query_manager.get_answer(samp_supp, samp_dist)).max()
+        print("{}\t{:.5f}\t{:.5f},".format(eps, max_error_random_support, max_error_sampled_support))

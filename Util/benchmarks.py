@@ -4,10 +4,12 @@ from datasets.dataset import Dataset
 import itertools
 
 
-def randomKway(name, number, marginal, seed=0):
+def randomKway(name, number, marginal, columns=None, seed=0):
     path = "datasets/{}.csv".format(name)
     domain = "datasets/{}-domain.json".format(name)
     data = Dataset.load(path, domain)
+    if columns is not None:
+        data = data.project(columns)
     return data, randomKwayData(data, number, marginal, seed)
 
 

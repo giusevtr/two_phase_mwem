@@ -37,11 +37,8 @@ def generate(real_answers:np.array,
     assert noise_multiple > 0
     neg_real_answers = 1 - real_answers
     D = np.sum(domain.shape)
-    Q_size = query_manager.num_queries
-
+    Q_size = query_manager.get_num_queries()
     # Calcualte T
-
-
     prev_queries = []
     neg_queries = []
 

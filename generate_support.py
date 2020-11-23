@@ -60,10 +60,12 @@ if __name__ == "__main__":
         fem_data_fun = fem.generate(real_ans, N, data.domain, query_manager, epsilon_list, delta,
                                        epsilon_split=0.01345, noise_multiple=0.099, samples=25)
         # Dualquery
-        dq_data_fun = dualquery.generate(real_ans, N, data.domain, query_manager, epsilon_list, delta, eta=3.36, samples=9, optimal_parameters_path=dq_param_path)
+        dq_data_fun = dualquery.generate(real_ans, N, data.domain, query_manager, epsilon_list, delta,
+                                         eta=3.36, samples=9, optimal_parameters_path=dq_param_path)
 
         for e in epsilon_list:
             # Save FEM
+            print(f'Saving data for epsilon={e}:')
             fem_data, fem_rho = fem_data_fun(e)
             fem_path = f'{ith_support_path}/fem_{e:.1f}.csv'
             fem_data.df.to_csv(fem_path, index=False)
