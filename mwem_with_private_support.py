@@ -78,10 +78,16 @@ if __name__ == "__main__":
                                                     epsilon=mwem_eps, delta=delta,
                                                     epsilon_split=0.02,
                                                     cumulative_rho=cumulative_rho)
-
                     mwem_max_error = np.abs(real_ans - query_manager.get_answer(mwem_support, A)).max()
 
-                    row = [run_id, support_algo, e, mwem_eps, support_max_error, mwem_max_error]
+                    # run BO to find the best error
+                    _, best_epsilon_split, best_error = mwem.bo_search(support_dataset, real_ans, N, query_manager,
+                                                    epsilon=mwem_eps, delta=delta,
+                                                    epsilon_split=0.02,
+                                                    cumulative_rho=cumulative_rho,
+                                                    epslon_split_range=[0.01, 0.05])
+
+                    row = [run_id, support_algo, e, mwem_eps, support_max_error, mwem_max_error,  best_error, best_epsilon_split]
                     RESULTS.append(row)
                     print(f'{row}')
     # return support_error, mwem_error
@@ -91,6 +97,7 @@ if __name__ == "__main__":
     os.makedirs(results_dir, exist_ok=True)
     results_path = f'{results_dir}/{file_prefix}.csv'
     print(f'saving results in {results_path}')
-    columns = ['run_id', 'support_algorithm', 'support_epsilon', 'total_epsilon', 'support_error', 'mwem_error']
+    columns = ['run_id', 'support_algorithm', 'support_epsilon', 'total_epsilon', 'support_error', 'mwem_error', 'best_mwem_error', 'best_epsilon_split']
+
     df = pd.DataFrame(RESULTS, columns=columns)
     df.to_csv(results_path, index=False)

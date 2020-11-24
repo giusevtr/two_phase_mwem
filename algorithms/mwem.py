@@ -8,6 +8,9 @@ from datasets.dataset import Dataset
 from datasets.domain import Domain
 from Util import benchmarks
 import argparse
+from GPyOpt.methods import BayesianOptimization
+import pandas as pd
+
 
 def get_data_onehot(data):
     df_data = data.df.copy()
@@ -95,6 +98,39 @@ def generate(start_data: Dataset,
         return A_avg, A
     return data_support, A_avg
 
+
+
+def bo_search(support_data: Dataset,
+              real_answers:np.array,
+              N: int,
+              query_manager: QueryManager,
+              epsilon: float,
+              delta: float,
+              epslon_split_range: tuple,   # should be in (0.5, 5)
+              cumulative_rho: float = 0,
+        bo_iters=25):
+    bo_domain = [{'name': 'eps0', 'type': 'continuous', 'domain':epslon_split_range}]
+
+    progress = tqdm(total=bo_iters, desc='BO-MWEM')
+
+    def get_error(params):
+        epsilon_split = params[0][0]
+        supp, dist = generate(start_data=support_data, real_answers=real_answers, N=N, query_manager=query_manager,
+                                        epsilon=epsilon, delta=delta, epsilon_split=epsilon_split, cumulative_rho=cumulative_rho)
+        max_error = np.abs(real_answers - query_manager.get_answer(supp, dist)).max()
+        progress.update()
+        progress.set_postfix({f'error(epsilon_split)': max_error})
+        return max_error
+
+    # --- Solve your problem
+    myBopt = BayesianOptimization(f=get_error, domain=bo_domain, exact_feval=False)
+    myBopt.run_optimization(max_iter=bo_iters)
+    min_error = myBopt.fx_opt
+
+    epsilon_split = myBopt.x_opt[0]
+    names = ["epsilon", "bo_iters", "epsilon_split",  "error"]
+    res = [[epsilon, bo_iters,  epsilon_split, min_error]]
+    return pd.DataFrame(res, columns=names), epsilon_split, min_error
 
 
 if __name__ == "__main__":
