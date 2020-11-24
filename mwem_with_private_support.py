@@ -82,10 +82,9 @@ if __name__ == "__main__":
 
                     # run BO to find the best error
                     _, best_epsilon_split, best_error = mwem.bo_search(support_dataset, real_ans, N, query_manager,
-                                                    epsilon=mwem_eps, delta=delta,
-                                                    epsilon_split=0.02,
-                                                    cumulative_rho=cumulative_rho,
-                                                    epslon_split_range=[0.01, 0.05])
+                                                                        epsilon=mwem_eps, delta=delta,
+                                                                        cumulative_rho=cumulative_rho,
+                                                                        epsilon_split_range=[0.01, 0.05])
 
                     row = [run_id, support_algo, e, mwem_eps, support_max_error, mwem_max_error,  best_error, best_epsilon_split]
                     RESULTS.append(row)

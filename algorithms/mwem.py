@@ -106,10 +106,10 @@ def bo_search(support_data: Dataset,
               query_manager: QueryManager,
               epsilon: float,
               delta: float,
-              epslon_split_range: tuple,   # should be in (0.5, 5)
+              epsilon_split_range: tuple,   # should be in (0.5, 5)
               cumulative_rho: float = 0,
         bo_iters=25):
-    bo_domain = [{'name': 'eps0', 'type': 'continuous', 'domain':epslon_split_range}]
+    bo_domain = [{'name': 'eps0', 'type': 'continuous', 'domain':epsilon_split_range}]
 
     progress = tqdm(total=bo_iters, desc='BO-MWEM')
 
