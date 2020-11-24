@@ -64,8 +64,14 @@ if __name__ == '__main__':
             mwem_mean = G.mean()['mwem_error'].values
             mwem_max = G.max()['mwem_error'].values
             mwem_min = G.min()['mwem_error'].values
-            plt.plot(epsilon_split_values, mwem_mean, label=algo)
+            plt.plot(epsilon_split_values, mwem_mean, label='mwem')
             plt.fill_between(epsilon_split_values, mwem_min, mwem_max, alpha=0.1)
+
+            best_mwem_mean = G.mean()['best_mwem_error'].values
+            best_mwem_max = G.max()['best_mwem_error'].values
+            best_mwem_min = G.min()['best_mwem_error'].values
+            plt.plot(epsilon_split_values, best_mwem_mean, label='best_mwem')
+            plt.fill_between(epsilon_split_values, best_mwem_min, best_mwem_max, alpha=0.1)
 
             if i == len(algos)-1:
                 plt.xticks(epsilon_split_values, rotation='vertical')
@@ -83,9 +89,13 @@ if __name__ == '__main__':
             if j == 0:
                 plt.ylabel('max-error')
 
+            plt.legend()
             plt.grid(linestyle='-')
             plt.ylim([0,0.3])
             plt.box(on=None)
-    plt.savefig('result.png')
+
+    plot_path = 'result.png'
+    plt.savefig(plot_path)
+    print(f'Saving in: {plot_path}')
 
 

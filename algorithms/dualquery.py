@@ -184,22 +184,22 @@ def bo_search(real_answers:np.array,
 
 if __name__ == "__main__":
     # description = ''
-    # formatter = argparse.ArgumentDefaultsHelpFormatter
-    # parser = argparse.ArgumentParser(description=description, formatter_class=formatter)
-    # parser.add_argument('dataset', type=str, nargs=1, help='queries')
-    # parser.add_argument('workload', type=int, nargs=1, help='queries')
-    # parser.add_argument('marginal', type=int, nargs=1, help='queries')
-    # parser.add_argument('epsilon', type=float, nargs='+', help='Privacy parameter')
+    formatter = argparse.ArgumentDefaultsHelpFormatter
+    parser = argparse.ArgumentParser(description=description, formatter_class=formatter)
+    parser.add_argument('dataset', type=str, nargs=1, help='queries')
+    parser.add_argument('workload', type=int, nargs=1, help='queries')
+    parser.add_argument('marginal', type=int, nargs=1, help='queries')
+    parser.add_argument('epsilon', type=float, nargs='+', help='Privacy parameter')
     # parser.add_argument('--eps_split_lo', type=float, default=0.01, help='eps0 parameter range')
     # parser.add_argument('--eps_split_hi', type=float, default=0.05, help='eps0 parameter range')
     # parser.add_argument('--noise_mult_lo', type=float, default=0.01, help='noise parameter range')
     # parser.add_argument('--noise_mult_hi', type=float, default=0.1, help='noise parameter range')
-    # args = parser.parse_args()
+    args = parser.parse_args()
     # print(vars(args))
-    dataset = 'adult'
-    workload = 64
-    marginal = 3
-    epsilon = [0.5]
+    dataset = args.dataset[0]
+    workload = args.workload[0]
+    marginal = args.marginal[0]
+    epsilon = [args.epsilon[0]]
     eta_low = 0.5
     eta_hi = 7
     samples_low = 2

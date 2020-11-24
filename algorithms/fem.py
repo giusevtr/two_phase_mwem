@@ -165,53 +165,54 @@ def generate(real_answers:np.array,
     # return fake_data, status
 
 
-if __name__ == "__main__":
-    description = ''
-    formatter = argparse.ArgumentDefaultsHelpFormatter
-    parser = argparse.ArgumentParser(description=description, formatter_class=formatter)
-    parser.add_argument('dataset', type=str, nargs=1, help='queries')
-    parser.add_argument('workload', type=int, nargs=1, help='queries')
-    parser.add_argument('marginal', type=int, nargs=1, help='queries')
-    parser.add_argument('epsilon', type=float, nargs='+', help='Privacy parameter')
-    parser.add_argument('--epsilon_split', type=float, default=0.02, help='eps0 hyperparameter')
-    parser.add_argument('--noise_multiple', type=float, default=0.02, help='noise hyperparameter')
-    parser.add_argument('--samples', type=int, default=50, help='samples hyperparameter')
-    args = parser.parse_args()
-
-    print("=============================================")
-    print(vars(args))
-
-    ######################################################
-    ## Get dataset
-    ######################################################
-    data, workloads = benchmarks.randomKway(args.dataset[0], args.workload[0], args.marginal[0])
-    N = data.df.shape[0]
-    delta = 1.0/N**2
-
-    ######################################################
-    ## Get Queries
-    ######################################################
-    stime = time.time()
-    query_manager = QueryManager(data.domain, workloads)
-    print("Number of queries = ", len(query_manager.queries))
-
-    real_ans = query_manager.get_answer(data)
-
-    ######################################################
-    ## Generate synthetic data with eps
-    ######################################################
-    fem_data_fun = generate(real_answers=real_ans,
-                               N=N,
-                               domain=data.domain,
-                               query_manager=query_manager,
-                               epsilon=args.epsilon,
-                               delta=delta,
-                               epsilon_split=args.epsilon_split,
-                               noise_multiple=args.noise_multiple,
-                               samples=args.samples)
-
-    for eps in args.epsilon:
-        syndata,_ = fem_data_fun(eps)
-        max_error = np.abs(query_manager.get_answer(data) - query_manager.get_answer(syndata)).max()
-        print("epsilon\tqueries\tmax_error\ttime")
-        print("{}\t{}\t{:.5f},".format(eps, len(query_manager.queries), max_error))
+# if __name__ == "__main__":
+#     description = ''
+#     formatter = argparse.ArgumentDefaultsHelpFormatter
+#     parser = argparse.ArgumentParser(description=description, formatter_class=formatter)
+#     parser.add_argument('dataset', type=str, nargs=1, help='queries')
+#     parser.add_argument('workload', type=int, nargs=1, help='queries')
+#     parser.add_argument('marginal', type=int, nargs=1, help='queries')
+#     parser.add_argument('epsilon', type=float, nargs='+', help='Privacy parameter')
+#     parser.add_argument('--epsilon_split', type=float, default=0.02, help='eps0 hyperparameter')
+#     parser.add_argument('--noise_multiple', type=float, default=0.02, help='noise hyperparameter')
+#     parser.add_argument('--samples', type=int, default=50, help='samples hyperparameter')
+#     args = parser.parse_args()
+#
+#     print("=============================================")
+#     print(vars(args))
+#
+#     ######################################################
+#     ## Get dataset
+#     ######################################################
+#     data, workloads = benchmarks.randomKway(args.dataset[0], args.workload[0], args.marginal[0])
+#     N = data.df.shape[0]
+#     delta = 1.0/N**2
+#
+#     ######################################################
+#     ## Get Queries
+#     ######################################################
+#     stime = time.time()
+#     query_manager = QueryManager(data.domain, workloads)
+#     print("Number of queries = ", len(query_manager.queries))
+#
+#     real_ans = query_manager.get_answer(data)
+#
+#     ######################################################
+#     ## Generate synthetic data with eps
+#     ######################################################
+#     fem_data_fun = generate(real_answers=real_ans,
+#                                N=N,
+#                                domain=data.domain,
+#                                query_manager=query_manager,
+#                                epsilon=args.epsilon,
+#                                delta=delta,
+#                                epsilon_split=args.epsilon_split,
+#                                noise_multiple=args.noise_multiple,
+#                                samples=args.samples)
+#
+#     for eps in args.epsilon:
+#         syndata,_ = fem_data_fun(eps)
+#         max_error = np.abs(query_manager.get_answer(data) - query_manager.get_answer(syndata)).max()
+#         print("epsilon\tqueries\tmax_error\ttime")
+#         print("{}\t{}\t{:.5f},".format(eps, len(query_manager.queries), max_error))
+#
