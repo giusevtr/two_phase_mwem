@@ -125,7 +125,6 @@ def generate(real_answers:np.array,
         # util2.progress_bar(epsilon, curr_eps, msg="dualquery: t={}".format(t))
 
     # fake_data = Dataset(pd.DataFrame(util2.decode_dataset(X, domain), columns=domain.attrs), domain)
-    print("")
     # print("max_mip_gap = ", max_mip_gap)
     # return {"X":fake_data}
     def data_fun(final_epsilon):
