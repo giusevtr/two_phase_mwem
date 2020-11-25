@@ -59,12 +59,14 @@ if __name__ == "__main__":
 
 
         for e in epsilon_list:
-            # FEM
-            fem_data_fun = fem.generate(real_ans, N, data.domain, query_manager, [e], delta,
-                                        epsilon_split=0.01345, noise_multiple=0.099, samples=25)
             # Dualquery
             dq_data_fun = dualquery.generate(real_ans, N, data.domain, query_manager, [e], delta,
                                              eta=3.36, samples=9, optimal_parameters_path=dq_param_path)
+
+            # FEM
+            fem_data_fun = fem.generate(real_ans, N, data.domain, query_manager, [e], delta,
+                                        epsilon_split=0.01345, noise_multiple=0.099, samples=25, show_prgress=False)
+
 
             # Save FEM
             print(f'Saving data for epsilon={e}:')

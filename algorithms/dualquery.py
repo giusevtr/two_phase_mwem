@@ -47,19 +47,19 @@ def generate(real_answers:np.array,
 
     cumulative_rho = 0
     epsilon_index = 0
+    last_epsilon_index = -1
     cumulative_rho_at_time_t = {}
 
     eta_t = {}
     samples_t = {}
     param_df = pd.read_csv(optimal_parameters_path)
     T = 0
-    last_epsilon_index = -1
     while True:
-        if optimal_parameters_path is not None and epsilon_index>last_epsilon_index:
+        if optimal_parameters_path is not None and epsilon_index > last_epsilon_index:
             last_epsilon_index = epsilon_index
             # Find the best parameters for the current epsilon
             epsilon_params = param_df[param_df['epsilon'] == epsilon[epsilon_index]]
-            if len(epsilon_params) >0 :
+            if len(epsilon_params) > 0:
                 g = epsilon_params[epsilon_params.error == epsilon_params.error.min()]
                 eta = g['eta'].values[0]
                 samples = int(g['samples'].values[0])
