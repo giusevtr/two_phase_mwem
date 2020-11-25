@@ -8,6 +8,8 @@ from Util import oracle_dq, util2, benchmarks
 from GPyOpt.methods import BayesianOptimization
 from tqdm import tqdm
 from Util.qm import QueryManager
+import argparse
+
 
 def search_T(eps, n, delta, eta, s):
     lo = 0
@@ -45,20 +47,24 @@ def generate(real_answers:np.array,
 
     cumulative_rho = 0
     epsilon_index = 0
-    T = 0
     cumulative_rho_at_time_t = {}
 
     eta_t = {}
     samples_t = {}
+    param_df = pd.read_csv(optimal_parameters_path)
+    T = 0
+    last_epsilon_index = -1
     while True:
-        if optimal_parameters_path is not None:
+        if optimal_parameters_path is not None and epsilon_index>last_epsilon_index:
+            last_epsilon_index = epsilon_index
             # Find the best parameters for the current epsilon
-            param_df = pd.read_csv(optimal_parameters_path)
             epsilon_params = param_df[param_df['epsilon'] == epsilon[epsilon_index]]
-            if len(epsilon_params) == 0: continue
-            eta = epsilon_params.min()['eta']
-            samples = int(epsilon_params.min()['samples'])
-            print(f'updating: at time={T} eta={eta} and samples={samples}')
+            if len(epsilon_params) >0 :
+                g = epsilon_params[epsilon_params.error == epsilon_params.error.min()]
+                eta = g['eta'].values[0]
+                samples = int(g['samples'].values[0])
+                print(f'For epilon={epsilon[epsilon_index]} and at time={T} params are: eta={eta} and samples={samples}')
+
         eta_t[T] = eta
         samples_t[T] = samples
 
