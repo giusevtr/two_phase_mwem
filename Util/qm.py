@@ -74,7 +74,7 @@ class QueryManager():
         if not isinstance(q_ids, Iterable):
             q_ids = [q_ids]
         W = []
-        assert np.max(q_ids) < self.get_num_queries(), f'q_ids={q_ids}'
+        assert (len(q_ids)==0) or np.max(q_ids) < self.get_num_queries(), f'q_ids={q_ids}'
         for i in q_ids:
             q_id = self.active_query_ids[i]
             w = np.zeros(self.dim)
