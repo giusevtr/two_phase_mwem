@@ -51,7 +51,7 @@ if __name__ == "__main__":
     os.makedirs(support_path, exist_ok=True)
 
     fem_data_fun = {}
-    for run_id in tqdm(range(total_runs), desc='Running FEM and DQ'):
+    for run_id in range(total_runs):
         ith_support_path = f'{support_path}/r_{run_id}'
         os.makedirs(ith_support_path, exist_ok=True)
         np.random.seed(run_id)
@@ -59,6 +59,7 @@ if __name__ == "__main__":
 
 
         for e in epsilon_list:
+            print(f'------> Running FEM and DQ: run {run_id}/{total_runs}, epsilon={e} in {epsilon_list}')
             # Dualquery
             dq_data_fun = dualquery.generate(real_ans, N, data.domain, query_manager, [e], delta,
                                              eta=3.36, samples=9, optimal_parameters_path=dq_param_path)
