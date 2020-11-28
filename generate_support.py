@@ -66,7 +66,7 @@ if __name__ == "__main__":
 
             # FEM
             fem_data_fun = fem.generate(real_ans, N, data.domain, query_manager, [e], delta,
-                                        epsilon_split=0.01345, noise_multiple=0.099, samples=25, show_prgress=False)
+                                        epsilon_split=0.01345, noise_multiple=0.099, samples=50, show_prgress=False)
 
 
             # Save FEM
@@ -86,4 +86,5 @@ if __name__ == "__main__":
             rho_file = open(dq_rho_path, 'w')
             rho_file.write(str(dq_rho))
             rho_file.close()
-            print(f'Saving {fem_path} and {dq_path}')
+            print(f'Saving {fem_path} and {dq_path}. fem_error={np.abs(real_ans - query_manager.get_answer(fem_data)).max():.3f}'
+                  f'\tdq_error={np.abs(real_ans - query_manager.get_answer(dq_data)).max():.3f}')
