@@ -95,8 +95,8 @@ def generate(start_data: Dataset,
     A_avg /= (T+1)
     assert np.abs(np.sum(A_avg) - 1) < 0.0001, 'A_avg is not a distribution'
     if return_last:
-        return A_avg, A, T
-    return data_support, A_avg, T
+        return A_avg, A
+    return data_support, A_avg
 
 
 
