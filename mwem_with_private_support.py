@@ -23,6 +23,7 @@ if __name__ == "__main__":
     print(vars(args))
     total_runs = 5
     epsilon_list = np.linspace(0.1, 0.5, 5)
+    epsilon_0 = 0.003
 
     ######################################################
     ## Get dataset
@@ -76,18 +77,18 @@ if __name__ == "__main__":
                 for mwem_eps in mwem_epsilon_values:
                     mwem_support, A = mwem.generate(support_dataset, real_ans, N, query_manager,
                                                     epsilon=mwem_eps, delta=delta,
-                                                    epsilon_split=0.02,
+                                                    epsilon_0=epsilon_0,
                                                     cumulative_rho=cumulative_rho)
                     mwem_max_error = np.abs(real_ans - query_manager.get_answer(mwem_support, A)).max()
 
-                    # run BO to find the best error
-                    _, best_epsilon_split, best_error = mwem.bo_search(support_dataset, real_ans, N, query_manager,
-                                                                        epsilon=mwem_eps, delta=delta,
-                                                                        cumulative_rho=cumulative_rho,
-                                                                        epsilon_split_range=[0.01, 0.05],
-                                                                       bo_iters=7)
+                    # # run BO to find the best error
+                    # _, best_epsilon_split, best_error = mwem.bo_search(support_dataset, real_ans, N, query_manager,
+                    #                                                     epsilon=mwem_eps, delta=delta,
+                    #                                                     cumulative_rho=cumulative_rho,
+                    #                                                     epsilon_split_range=[0.01, 0.05],
+                    #                                                    bo_iters=7)
 
-                    row = [run_id, support_algo, e, mwem_eps, support_max_error, mwem_max_error,  best_error, best_epsilon_split]
+                    row = [run_id, support_algo, e, mwem_eps, support_max_error, mwem_max_error]
                     RESULTS.append(row)
                     print(f'{row}')
     # return support_error, mwem_error
@@ -97,7 +98,7 @@ if __name__ == "__main__":
     os.makedirs(results_dir, exist_ok=True)
     results_path = f'{results_dir}/{file_prefix}.csv'
     print(f'saving results in {results_path}')
-    columns = ['run_id', 'support_algorithm', 'support_epsilon', 'total_epsilon', 'support_error', 'mwem_error', 'best_mwem_error', 'best_epsilon_split']
+    columns = ['run_id', 'support_algorithm', 'support_epsilon', 'total_epsilon', 'support_error', 'mwem_error']
 
     df = pd.DataFrame(RESULTS, columns=columns)
     df.to_csv(results_path, index=False)

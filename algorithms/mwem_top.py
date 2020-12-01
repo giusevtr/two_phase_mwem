@@ -42,8 +42,10 @@ satisfies rho-zCDP
 '''
 def generate(start_data: Dataset,
              real_answers:np.array,
+             real_answers_zeros:np.array,
              N: int,
-             query_manager: QueryManager,
+             query_manager_top: QueryManager,
+             query_manager_zeros: QueryManager,
              epsilon: float,
              delta: float,
              epsilon_0: float,
@@ -68,8 +70,7 @@ def generate(start_data: Dataset,
         T += 1
         cumulative_rho += rho_0
 
-        fake_answers = query_manager.get_answer(data_support, weights=A)
-
+        fake_answers = query_manager_top.get_answer(data_support, weights=A)
         # 1) Exponential Mechanism
         score = np.abs(real_answers - fake_answers)
         # print(f'error({T}) = {np.max(score)}, rho={cumulative_rho},   eps0={epsilon_0},   epsilon={epsilon}')
@@ -91,6 +92,34 @@ def generate(start_data: Dataset,
         A = A * factor
         A = A / A.sum()
         A_avg += A
+
+        ## zeroes
+        fake_answers_zeros = query_manager_zeros.get_answer(data_support, weights=A)
+        # 1) Exponential Mechanism
+        score = np.abs(real_answers_zeros - fake_answers_zeros)
+        # print(f'error({T}) = {np.max(score)}, rho={cumulative_rho},   eps0={epsilon_0},   epsilon={epsilon}')
+        # eps0 = np.sqrt(2*rho_0)
+        q_t_ind = exponential_mechanism.sample(score, N, eps0=epsilon_0 / 2)
+
+        # 2) Laplacian Mechanism
+        m_t = real_answers_zeros[q_t_ind]
+        m_t += np.random.laplace(loc=0, scale=(2 / (N * epsilon_0)))  # Note: epsilon_0 = eps / T, sensitivity is 1/N
+        m_t = np.clip(m_t, 0, 1)
+
+        # 3) Multiplicative Weights update
+        query = query_manager_zeros.get_query_workload([q_t_ind])
+        q_t_x = data_onehot.dot(query.T).flatten()
+        q_t_x = (q_t_x == query.sum()).astype(int)
+        q_t_A = fake_answers_zeros[q_t_ind]
+
+        factor = np.exp(q_t_x * (m_t - q_t_A))  # check if n times distribution matters - / (2 * N)
+        A = A * factor
+        A = A / A.sum()
+        A_avg += A
+
+
+
+
 
     A_avg /= (T+1)
     assert np.abs(np.sum(A_avg) - 1) < 0.0001, 'A_avg is not a distribution'
