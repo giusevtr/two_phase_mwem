@@ -67,11 +67,6 @@ if __name__ == '__main__':
             plt.plot(epsilon_split_values, mwem_mean, label='mwem')
             plt.fill_between(epsilon_split_values, mwem_min, mwem_max, alpha=0.1)
 
-            best_mwem_mean = G.mean()['best_mwem_error'].values
-            best_mwem_max = G.max()['best_mwem_error'].values
-            best_mwem_min = G.min()['best_mwem_error'].values
-            plt.plot(epsilon_split_values, best_mwem_mean, label='best_mwem')
-            plt.fill_between(epsilon_split_values, best_mwem_min, best_mwem_max, alpha=0.1)
 
             if i == len(algos)-1:
                 plt.xticks(epsilon_split_values, rotation='vertical')

@@ -23,7 +23,7 @@ if __name__ == "__main__":
     print(vars(args))
     total_runs = 5
     epsilon_list = np.linspace(0.1, 0.5, 5)
-    epsilon_0 = 0.003
+    epsilon_0 = 0.0015
 
     ######################################################
     ## Get dataset
